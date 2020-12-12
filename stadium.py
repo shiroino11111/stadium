@@ -9,6 +9,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import LabelEncoder
 
+import calc_lightgbm
+
 def main():
     def studium_latlon(studium_x):
         # スタジアムの緯度と経度
@@ -323,31 +325,7 @@ def main():
     df_stadium_class = pd.merge(df_weather, df_stadium_average, on="stadium")
     df1_merge = df_stadium_class
 
-    #各特徴量を結合した上でdf1_mergeをLabelEncoder
-   
-
-    df1_labelencode = df1_merge.copy()
-
-    for c in ['stage', 'home', 'away', 'stadium', 'weekday', "weather_y"]:
-        le = LabelEncoder()
-        le = le.fit(df1_labelencode[c])
-        df1_labelencode[c] = le.transform(df1_labelencode[c])
-
-    df1_labelencode.head(1)
-
-    # 不要になった変数を省く。(特徴量選択)
-    df2 = df1_labelencode.loc[:, ['id', 'y', 'year', 'home', 'stadium', 'capa', 'match_sec',
-                                  'month', 'weather_y', 'holiday', 'distance_away', 'stadium_class', 
-                                  'awayteam_away_avarage', 'hometeam_home_avarage', 'stadium_average',
-                                  'point_5game_average_away']]
-
-    # カラム名変更
-    df2 = df2.rename({"weather_y":"weather"}, axis=1)
-
-    # 満員率
-    df2['Occupancy_rate'] = df2['y'] / df2['capa']
-
-    calc_lightgbm.main(df2)
+    calc_lightgbm.main(df1_merge)
 
 
 if __name__ == '__main__':
